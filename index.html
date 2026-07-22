@@ -1050,10 +1050,9 @@
 
   async function loadAttendance(){
     try{
-      const result = await window.storage.get(STORAGE_KEY, false);
-      if(result && result.value){
-        const arr = JSON.parse(result.value);
-        attendance = new Set(arr);
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        attendance = new Set(JSON.parse(raw));
       }
     }catch(e){
       // no saved data yet, or storage unavailable — start fresh
@@ -1065,7 +1064,7 @@
 
   async function saveAttendance(){
     try{
-      await window.storage.set(STORAGE_KEY, JSON.stringify(Array.from(attendance)), false);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(attendance)));
     }catch(e){
       console.error('Could not save attendance', e);
     }
@@ -1249,9 +1248,9 @@
 
   async function loadProgress(){
     try{
-      const result = await window.storage.get(PROGRESS_KEY, false);
-      if(result && result.value){
-        progressLog = JSON.parse(result.value);
+      const raw = localStorage.getItem(PROGRESS_KEY);
+      if(raw){
+        progressLog = JSON.parse(raw);
       }
     }catch(e){
       progressLog = [];
@@ -1261,7 +1260,7 @@
 
   async function saveProgress(){
     try{
-      await window.storage.set(PROGRESS_KEY, JSON.stringify(progressLog), false);
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify(progressLog));
     }catch(e){
       console.error('Could not save progress log', e);
     }
