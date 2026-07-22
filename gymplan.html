@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sharon's Weekly Gym Checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F5F6F2;
+    --surface: #FFFFFF;
+    --text: #2B2E29;
+    --text-muted: #868C82;
+    --line: #E9EAE4;
+    --tue: #4F7CAC;
+    --tue-soft: #E9F0F6;
+    --wed: #6E8F72;
+    --wed-soft: #EAF1EA;
+    --thu: #C1707A;
+    --thu-soft: #F7EAEC;
+    --home: #9482A8;
+    --home-soft: #F0EBF3;
+    --radius: 18px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    padding: 48px 20px 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page{
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .eyebrow{
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 40px;
+    line-height: 1.1;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .subhead{
+    color: var(--text-muted);
+    font-size: 15px;
+    margin: 0 0 32px;
+  }
+
+  /* week strip */
+  .week-strip{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 40px;
+  }
+
+  .pill{
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .pill.active{ background: var(--tue-soft); border-color: var(--tue); }
+  .pill[data-day="wed"].active{ background: var(--wed-soft); border-color: var(--wed); }
+  .pill[data-day="thu"].active{ background: var(--thu-soft); border-color: var(--thu); }
+
+  .dot{
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .pill .count{
+    margin-left: auto;
+    font-weight: 500;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* day card */
+  .day{
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    padding: 26px 26px 22px;
+    margin-bottom: 20px;
+    border-left: 5px solid transparent;
+  }
+
+  .day-head{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .day-title{
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .day-progress{
+    font-size: 13px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .day-focus{
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0 0 18px;
+    font-style: italic;
+    font-family: 'Fraunces', serif;
+  }
+
+  .item-icon{
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--bg);
+  }
+  .item-icon svg{
+    width: 19px;
+    height: 19px;
+  }
+
+  .day[data-day].tab-hidden{ display: none; }
+
+  .item{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+  }
+  .item:first-of-type{ border-top: none; }
+
+  .item input[type="checkbox"]{
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 1.5px solid #D5D7CF;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.15s ease;
+  }
+
+  .item input[type="checkbox"]:checked{
+    background: currentColor;
+    border-color: currentColor;
+  }
+
+  .item input[type="checkbox"]:checked::after{
+    content: "";
+    position: absolute;
+    left: 6px; top: 2px;
+    width: 5px; height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  .item-text{
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .item-meta{
+    font-size: 13px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .item.done .item-text{
+    color: var(--text-muted);
+    text-decoration: line-through;
+    text-decoration-color: #D5D7CF;
+  }
+
+  /* callout */
+  .callout{
+    border-radius: 14px;
+    padding: 16px 18px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    margin: 22px 0;
+    display: flex;
+    gap: 12px;
+  }
+  .callout .icon{ font-size: 16px; line-height: 1.4; }
+  .callout b{ font-weight: 700; }
+
+  section.home{
+    background: var(--home-soft);
+    border-radius: var(--radius);
+    padding: 26px 26px 22px;
+    margin-top: 8px;
+  }
+  section.home .day-title{ color: var(--home); }
+
+  footer{
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 40px;
+    letter-spacing: 0.03em;
+  }
+
+  /* calendar */
+  .calendar{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 26px 26px 22px;
+    margin-bottom: 20px;
+  }
+
+  .cal-head{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .cal-head h2{
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .cal-nav{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .cal-nav button{
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    width: 30px; height: 30px;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+  }
+  .cal-nav button:hover{ background: var(--line); }
+
+  #cal-label{
+    font-size: 14px;
+    font-weight: 600;
+    min-width: 118px;
+    text-align: center;
+  }
+
+  .cal-sub{
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0 0 18px;
+    font-style: italic;
+    font-family: 'Fraunces', serif;
+  }
+
+  .cal-grid{
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+
+  .cal-dow{
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding-bottom: 6px;
+  }
+
+  .cal-cell{
+    aspect-ratio: 1;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    position: relative;
+    color: var(--text);
+  }
+
+  .cal-cell.empty{ visibility: hidden; }
+
+  .cal-cell.gym{
+    cursor: pointer;
+    background: var(--bg);
+    border: 1.5px solid var(--line);
+  }
+  .cal-cell.gym:hover{ border-color: #c9cbc1; }
+
+  .cal-cell.gym.tue{ color: var(--tue); }
+  .cal-cell.gym.wed{ color: var(--wed); }
+  .cal-cell.gym.thu{ color: var(--thu); }
+
+  .cal-cell.gym.done.tue{ background: var(--tue); color: #fff; border-color: var(--tue); }
+  .cal-cell.gym.done.wed{ background: var(--wed); color: #fff; border-color: var(--wed); }
+  .cal-cell.gym.done.thu{ background: var(--thu); color: #fff; border-color: var(--thu); }
+
+  .cal-cell.rest{
+    color: #C7C9C0;
+  }
+
+  .cal-foot{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .cal-foot .legend{
+    display: flex;
+    gap: 14px;
+  }
+  .cal-foot .legend span{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .cal-foot .legend .sw{
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  /* progress check-in */
+  .progress-card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 26px 26px 22px;
+    margin-bottom: 20px;
+  }
+
+  .progress-card h2{
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+
+  .progress-form{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    margin: 18px 0 6px;
+  }
+
+  .progress-form .field{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .progress-form label{
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .progress-form input[type="date"],
+  .progress-form input[type="number"],
+  .progress-form input[type="text"]{
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .progress-form input[type="number"]{ width: 90px; }
+  .progress-form input[type="text"]{ width: 180px; }
+
+  .progress-form button{
+    background: var(--home);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Manrope', sans-serif;
+  }
+  .progress-form button:hover{ opacity: 0.9; }
+
+  .progress-summary{
+    display: flex;
+    gap: 24px;
+    margin: 18px 0 6px;
+    padding: 14px 16px;
+    background: var(--home-soft);
+    border-radius: 12px;
+  }
+  .progress-summary .stat{ display: flex; flex-direction: column; }
+  .progress-summary .stat .num{
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--home);
+  }
+  .progress-summary .stat .lbl{
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .progress-empty{
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+    font-family: 'Fraunces', serif;
+    padding: 10px 0;
+  }
+
+  .progress-list{ margin-top: 8px; }
+  .progress-row{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+  }
+  .progress-row:first-child{ border-top: none; }
+  .progress-row .p-date{ width: 88px; color: var(--text-muted); font-size: 12px; }
+  .progress-row .p-weight{ font-weight: 600; width: 60px; }
+  .progress-row .p-delta{ width: 60px; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .progress-row .p-delta.down{ color: var(--wed); }
+  .progress-row .p-delta.up{ color: var(--thu); }
+  .progress-row .p-note{ flex: 1; color: var(--text-muted); font-size: 13px; font-style: italic; }
+  .progress-row .p-del{
+    background: none; border: none; color: var(--text-muted);
+    cursor: pointer; font-size: 13px; padding: 4px;
+  }
+  .progress-row .p-del:hover{ color: var(--thu); }
+
+  /* streak & badges */
+  .motivation-card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px 26px 22px;
+    margin-bottom: 20px;
+  }
+
+  .motivation-card h2{
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 16px;
+  }
+
+  .streak-row{
+    display: flex;
+    gap: 24px;
+    margin-bottom: 20px;
+  }
+
+  .streak-stat{
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: var(--thu-soft);
+    flex: 1;
+  }
+  .streak-stat.longest{ background: var(--tue-soft); }
+
+  .streak-stat .num{
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--thu);
+  }
+  .streak-stat.longest .num{ color: var(--tue); }
+
+  .streak-stat .lbl{
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 10px;
+  }
+
+  .badge{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 8px;
+    border-radius: 12px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    text-align: center;
+  }
+
+  .badge .icon{
+    font-size: 24px;
+    filter: grayscale(100%);
+    opacity: 0.35;
+  }
+  .badge.unlocked .icon{
+    filter: none;
+    opacity: 1;
+  }
+
+  .badge .b-label{
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    line-height: 1.3;
+  }
+  .badge.unlocked .b-label{ color: var(--text); }
+
+  .badge .b-sub{
+    font-size: 10px;
+    color: #C7C9C0;
+  }
+
+  @media (max-width: 480px){
+    .streak-row{ flex-direction: column; gap: 10px; }
+  }
+
+  .cal-cell.today{
+    box-shadow: 0 0 0 2px var(--home);
+  }
+  .cal-cell.today::after{
+    content: "";
+    position: absolute;
+    bottom: 3px;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--home);
+  }
+  .cal-cell.gym.today.done::after{
+    background: #fff;
+  }
+
+  /* weight progress bar */
+  .weight-bar-wrap{
+    margin: 20px 0 4px;
+  }
+
+  .weight-bar-labels{
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .weight-bar-track{
+    position: relative;
+    height: 10px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    overflow: visible;
+  }
+
+  .weight-bar-fill{
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--home), var(--thu));
+    transition: width 0.4s ease;
+  }
+
+  .weight-bar-knob{
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--surface);
+    border: 2px solid var(--home);
+    color: var(--home);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    transition: left 0.4s ease;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  @media (max-width: 480px){
+    .progress-form input[type="text"]{ width: 100%; }
+    .progress-summary{ gap: 16px; flex-wrap: wrap; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .item input[type="checkbox"]{ transition: none; }
+  }
+
+  @media (max-width: 480px){
+    h1{ font-size: 32px; }
+    .week-strip{ flex-wrap: wrap; }
+    .pill{ min-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true">
+  <defs>
+    <!-- pulling motion: lat pulldown / seated row -->
+    <symbol id="icon-pull" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="4.2" r="2"/>
+      <path d="M12 6.2 V15"/>
+      <path d="M12 7.5 L18 6 M12 7.5 L18 10"/>
+      <path d="M12 15 L9 20 M12 15 L15 20"/>
+    </symbol>
+
+    <!-- rear delt fly: bent over, arms sweeping back -->
+    <symbol id="icon-rear-fly" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="9" cy="6" r="2"/>
+      <path d="M9 8 L15 15"/>
+      <path d="M12 10 L18 7 M12 10 L18 14"/>
+      <path d="M15 15 L13 20 M15 15 L18 19"/>
+    </symbol>
+
+    <!-- lateral raise: T-pose arms out to sides -->
+    <symbol id="icon-raise" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="4.2" r="2"/>
+      <path d="M12 6.2 V15"/>
+      <path d="M12 8 L5 8 M12 8 L19 8"/>
+      <path d="M12 15 L9 20 M12 15 L15 20"/>
+    </symbol>
+
+    <!-- core anti-rotation: pallof press -->
+    <symbol id="icon-core" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="4.2" r="2"/>
+      <path d="M12 6.2 V15"/>
+      <path d="M12 9 L19 9"/>
+      <path d="M16 6.5 Q19 9 16 11.5"/>
+      <path d="M12 15 L9 20 M12 15 L15 20"/>
+    </symbol>
+
+    <!-- chest / shoulder press: arms pushing forward -->
+    <symbol id="icon-press" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="4.2" r="2"/>
+      <path d="M12 6.2 V15"/>
+      <path d="M12 8 L7 10 M7 10 L4 8"/>
+      <path d="M12 8 L17 10 M17 10 L20 8"/>
+      <path d="M12 15 L9 20 M12 15 L15 20"/>
+    </symbol>
+
+    <!-- chest fly: standing, arms hugging forward -->
+    <symbol id="icon-chest-fly" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="4.2" r="2"/>
+      <path d="M12 6.2 V15"/>
+      <path d="M12 8 Q7 9 6 13"/>
+      <path d="M12 8 Q17 9 18 13"/>
+      <path d="M12 15 L9 20 M12 15 L15 20"/>
+    </symbol>
+
+    <!-- triceps pushdown: elbow bent, forearm pressing down -->
+    <symbol id="icon-pushdown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="4.2" r="2"/>
+      <path d="M11 6.2 V15"/>
+      <path d="M11 8 L15 9 L14 15"/>
+      <path d="M11 8 L8 9"/>
+      <path d="M11 15 L8 20 M11 15 L14 20"/>
+    </symbol>
+
+    <!-- overhead triceps extension -->
+    <symbol id="icon-overhead" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="4.2" r="2"/>
+      <path d="M12 6.2 V15"/>
+      <path d="M12 7 L9 3.5"/>
+      <path d="M12 7 L15 3.5 L14 7.5"/>
+      <path d="M12 15 L9 20 M12 15 L15 20"/>
+    </symbol>
+
+    <!-- leg press: seated, knees bent pressing platform -->
+    <symbol id="icon-leg-press" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="7" cy="6" r="2"/>
+      <path d="M7 8 L11 11"/>
+      <path d="M11 11 L11 15 L16 15"/>
+      <path d="M11 11 L11 16 L15 19"/>
+      <path d="M16 12 V18"/>
+    </symbol>
+
+    <!-- hip thrust: bridge pose -->
+    <symbol id="icon-hip-thrust" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="5.5" cy="14" r="2"/>
+      <path d="M5.5 16 L11 16 L15 12"/>
+      <path d="M11 16 L11 19"/>
+      <path d="M15 12 V17 M18 12 V17"/>
+    </symbol>
+
+    <!-- leg curl: knee bending back -->
+    <symbol id="icon-leg-curl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="7" cy="6" r="2"/>
+      <path d="M7 8 L7 14"/>
+      <path d="M7 14 L11 15 L11 11"/>
+      <path d="M7 14 L4 17"/>
+    </symbol>
+
+    <!-- pull-through: hip hinge reaching down -->
+    <symbol id="icon-pull-through" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="9" cy="5" r="2"/>
+      <path d="M9 7 L14 14"/>
+      <path d="M14 14 L11 20"/>
+      <path d="M14 14 L18 19"/>
+      <path d="M12 9 L9 12"/>
+    </symbol>
+
+    <!-- calf raise: standing on toes -->
+    <symbol id="icon-calf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="4.2" r="2"/>
+      <path d="M12 6.2 V14"/>
+      <path d="M12 8 L8 10 M12 8 L16 10"/>
+      <path d="M12 14 L10 18 L10 19.5"/>
+      <path d="M12 14 L14 18 L14 19.5"/>
+    </symbol>
+
+    <!-- cardio: running figure -->
+    <symbol id="icon-cardio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="14" cy="4.2" r="2"/>
+      <path d="M13 6.5 L9 10 L12 12 L10 16"/>
+      <path d="M12 12 L16 14"/>
+      <path d="M9 10 L6 8"/>
+      <path d="M10 16 L7 19"/>
+      <path d="M12 12 L15 18"/>
+    </symbol>
+    <!-- plank: straight horizontal hold -->
+    <symbol id="icon-plank" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18" cy="7" r="2"/>
+      <path d="M16 8.5 L5 17"/>
+      <path d="M16 8.5 L18 13"/>
+      <path d="M5 17 L8 19"/>
+    </symbol>
+
+    <!-- dead bug: lying, opposite arm/leg extended -->
+    <symbol id="icon-deadbug" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="6" cy="12" r="2"/>
+      <path d="M8 12 H14"/>
+      <path d="M10 12 L10 7"/>
+      <path d="M13 12 L18 15"/>
+      <path d="M14 12 L18 9"/>
+    </symbol>
+
+    <!-- bird dog: kneeling, opposite arm/leg extended -->
+    <symbol id="icon-birddog" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="16" cy="9" r="2"/>
+      <path d="M14 10 L7 13"/>
+      <path d="M9 12.5 L9 17"/>
+      <path d="M12 11.5 L12 17"/>
+      <path d="M14 10 L19 8"/>
+      <path d="M7 13 L3 12"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="page">
+
+  <div class="eyebrow">Weekly Plan · Gym Days</div>
+  <h1>Sharon's Gym Checklist</h1>
+  <p class="subhead">Trim, tone, firm up — three focused sessions a week. Tap a day below to view its plan.</p>
+
+  <div class="week-strip" id="week-strip">
+    <div class="pill" data-day="tue"><span class="dot" style="background:var(--tue)"></span>Tue <span class="count" id="count-tue">0/6</span></div>
+    <div class="pill" data-day="wed"><span class="dot" style="background:var(--wed)"></span>Wed <span class="count" id="count-wed">0/6</span></div>
+    <div class="pill" data-day="thu"><span class="dot" style="background:var(--thu)"></span>Thu <span class="count" id="count-thu">0/6</span></div>
+  </div>
+
+  <!-- STREAK & MILESTONES -->
+  <div class="motivation-card">
+    <h2>Streak &amp; Milestones</h2>
+    <div class="streak-row">
+      <div class="streak-stat">
+        <span class="num" id="streak-current">0</span>
+        <span class="lbl">Week Streak</span>
+      </div>
+      <div class="streak-stat longest">
+        <span class="num" id="streak-longest">0</span>
+        <span class="lbl">Best Streak</span>
+      </div>
+    </div>
+    <div class="badge-grid" id="badge-grid"></div>
+  </div>
+
+  <!-- TUESDAY -->
+  <div class="day" style="border-left-color:var(--tue)" data-day="tue">
+    <div class="day-head">
+      <h2 class="day-title" style="color:var(--tue)">Tuesday</h2>
+      <span class="day-progress" id="progress-tue">0/6 done</span>
+    </div>
+    <p class="day-focus">Back + Shoulders (Pull)</p>
+
+    <label class="item"><input type="checkbox" style="color:var(--tue)"><span class="item-icon" style="color:var(--tue)"><svg><use href="#icon-pull"/></svg></span><span class="item-text">Lat Pulldown Machine</span><span class="item-meta">3 × 12</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--tue)"><span class="item-icon" style="color:var(--tue)"><svg><use href="#icon-pull"/></svg></span><span class="item-text">Seated Cable Row Machine</span><span class="item-meta">3 × 12</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--tue)"><span class="item-icon" style="color:var(--tue)"><svg><use href="#icon-rear-fly"/></svg></span><span class="item-text">Rear Delt Fly Machine</span><span class="item-meta">2 × 15</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--tue)"><span class="item-icon" style="color:var(--tue)"><svg><use href="#icon-raise"/></svg></span><span class="item-text">Seated Dumbbell Lateral Raise</span><span class="item-meta">3 × 12</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--tue)"><span class="item-icon" style="color:var(--tue)"><svg><use href="#icon-core"/></svg></span><span class="item-text">Cable Pallof Press</span><span class="item-meta">2 × 10/side</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--tue)"><span class="item-icon" style="color:var(--tue)"><svg><use href="#icon-cardio"/></svg></span><span class="item-text">Cardio Finisher</span><span class="item-meta">10–15 min, flexible</span></label>
+  </div>
+
+  <!-- WEDNESDAY -->
+  <div class="day" style="border-left-color:var(--wed)" data-day="wed">
+    <div class="day-head">
+      <h2 class="day-title" style="color:var(--wed)">Wednesday</h2>
+      <span class="day-progress" id="progress-wed">0/6 done</span>
+    </div>
+    <p class="day-focus">Chest + Triceps (Push)</p>
+
+    <label class="item"><input type="checkbox" style="color:var(--wed)"><span class="item-icon" style="color:var(--wed)"><svg><use href="#icon-press"/></svg></span><span class="item-text">Chest Press Machine</span><span class="item-meta">3 × 12</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--wed)"><span class="item-icon" style="color:var(--wed)"><svg><use href="#icon-chest-fly"/></svg></span><span class="item-text">Cable Chest Fly</span><span class="item-meta">3 × 12</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--wed)"><span class="item-icon" style="color:var(--wed)"><svg><use href="#icon-pushdown"/></svg></span><span class="item-text">Triceps Pushdown (cable)</span><span class="item-meta">3 × 12</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--wed)"><span class="item-icon" style="color:var(--wed)"><svg><use href="#icon-overhead"/></svg></span><span class="item-text">Seated Overhead Triceps Extension</span><span class="item-meta">2 × 12</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--wed)"><span class="item-icon" style="color:var(--wed)"><svg><use href="#icon-core"/></svg></span><span class="item-text">Cable Pallof Press</span><span class="item-meta">2 × 10/side</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--wed)"><span class="item-icon" style="color:var(--wed)"><svg><use href="#icon-cardio"/></svg></span><span class="item-text">Cardio Finisher</span><span class="item-meta">10–15 min, flexible</span></label>
+
+    <div class="callout" style="background:var(--wed-soft)">
+      <span class="icon">💧</span>
+      <span>Keep the overhead triceps extension light and seated for back support. Skip or lighten anything that doesn't feel comfortable.</span>
+    </div>
+  </div>
+
+  <!-- THURSDAY -->
+  <div class="day" style="border-left-color:var(--thu)" data-day="thu">
+    <div class="day-head">
+      <h2 class="day-title" style="color:var(--thu)">Thursday</h2>
+      <span class="day-progress" id="progress-thu">0/6 done</span>
+    </div>
+    <p class="day-focus">Legs + Glutes</p>
+
+    <label class="item"><input type="checkbox" style="color:var(--thu)"><span class="item-icon" style="color:var(--thu)"><svg><use href="#icon-leg-press"/></svg></span><span class="item-text">Leg Press</span><span class="item-meta">3 × 12</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--thu)"><span class="item-icon" style="color:var(--thu)"><svg><use href="#icon-hip-thrust"/></svg></span><span class="item-text">Hip Thrust Machine</span><span class="item-meta">3 × 12</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--thu)"><span class="item-icon" style="color:var(--thu)"><svg><use href="#icon-leg-curl"/></svg></span><span class="item-text">Leg Curl Machine</span><span class="item-meta">3 × 12</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--thu)"><span class="item-icon" style="color:var(--thu)"><svg><use href="#icon-pull-through"/></svg></span><span class="item-text">Cable Pull-Through</span><span class="item-meta">3 × 12</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--thu)"><span class="item-icon" style="color:var(--thu)"><svg><use href="#icon-calf"/></svg></span><span class="item-text">Standing Calf Raise Machine</span><span class="item-meta">2 × 15</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--thu)"><span class="item-icon" style="color:var(--thu)"><svg><use href="#icon-cardio"/></svg></span><span class="item-text">Cardio Finisher</span><span class="item-meta">10–15 min, flexible</span></label>
+  </div>
+
+  <div class="callout" style="background:var(--thu-soft)">
+    <span class="icon">🌿</span>
+    <span><b>Good to know:</b> any sharp pain, numbness, or tingling — stop that exercise and check with a physio. Ask a staff member to show you the seat settings on each machine in week one, it makes a real difference.</span>
+  </div>
+
+  <!-- PROGRESS CHECK-IN -->
+  <div class="progress-card">
+    <h2>Progress Check-In</h2>
+    <p class="cal-sub" style="margin-bottom:0;">Every 4 weeks tells a truer story than every 2 — trends over single numbers.</p>
+
+    <div class="progress-form">
+      <div class="field">
+        <label for="p-date">Date</label>
+        <input type="date" id="p-date">
+      </div>
+      <div class="field">
+        <label for="p-weight">Weight (kg)</label>
+        <input type="number" id="p-weight" step="0.1" min="0" placeholder="63.0">
+      </div>
+      <div class="field">
+        <label for="p-note">How's it going? (optional)</label>
+        <input type="text" id="p-note" placeholder="e.g. clothes fit looser">
+      </div>
+      <button id="p-add">Log entry</button>
+    </div>
+
+    <div class="progress-summary" id="progress-summary" style="display:none;">
+      <div class="stat"><span class="num" id="stat-since">–</span><span class="lbl">Since start</span></div>
+      <div class="stat"><span class="num" id="stat-togo">–</span><span class="lbl">To go (55kg)</span></div>
+      <div class="stat"><span class="num" id="stat-latest">–</span><span class="lbl">Latest</span></div>
+    </div>
+
+    <div class="weight-bar-wrap" id="weight-bar-wrap" style="display:none;">
+      <div class="weight-bar-labels">
+        <span id="wb-start-label">Start</span>
+        <span>Goal: 55kg</span>
+      </div>
+      <div class="weight-bar-track">
+        <div class="weight-bar-fill" id="weight-bar-fill" style="width:0%;"></div>
+        <div class="weight-bar-knob" id="weight-bar-knob" style="left:0%;">–</div>
+      </div>
+    </div>
+
+    <div id="progress-list" class="progress-list">
+      <p class="progress-empty">No entries yet — log your first check-in whenever you're ready.</p>
+    </div>
+  </div>
+
+  <!-- CALENDAR CHECK-IN -->
+  <div class="calendar">
+    <div class="cal-head">
+      <h2>Calendar Check-In</h2>
+      <div class="cal-nav">
+        <button id="cal-prev" aria-label="Previous month">&larr;</button>
+        <span id="cal-label">August 2026</span>
+        <button id="cal-next" aria-label="Next month">&rarr;</button>
+      </div>
+    </div>
+    <p class="cal-sub">Tap a gym day once you've been — your log carries over each time you open this.</p>
+
+    <div class="cal-grid" id="cal-dow-row">
+      <div class="cal-dow">Su</div>
+      <div class="cal-dow">Mo</div>
+      <div class="cal-dow">Tu</div>
+      <div class="cal-dow">We</div>
+      <div class="cal-dow">Th</div>
+      <div class="cal-dow">Fr</div>
+      <div class="cal-dow">Sa</div>
+    </div>
+    <div class="cal-grid" id="cal-days" style="margin-top:6px;"></div>
+
+    <div class="cal-foot">
+      <span id="cal-summary">0 of 0 sessions logged this month</span>
+      <span class="legend">
+        <span><span class="sw" style="background:var(--tue)"></span>Tue</span>
+        <span><span class="sw" style="background:var(--wed)"></span>Wed</span>
+        <span><span class="sw" style="background:var(--thu)"></span>Thu</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- HOME CORE -->
+  <section class="home" data-day="home">
+    <div class="day-head">
+      <h2 class="day-title">Optional · At Home</h2>
+      <span class="day-progress" id="progress-home">0/3 done</span>
+    </div>
+    <p class="day-focus">Floor core, 2–3× a week, 10–15 min</p>
+
+    <label class="item"><input type="checkbox" style="color:var(--home)"><span class="item-icon" style="color:var(--home)"><svg><use href="#icon-plank"/></svg></span><span class="item-text">Plank</span><span class="item-meta">3 × 20–30 sec</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--home)"><span class="item-icon" style="color:var(--home)"><svg><use href="#icon-deadbug"/></svg></span><span class="item-text">Dead Bug</span><span class="item-meta">2 × 10/side</span></label>
+    <label class="item"><input type="checkbox" style="color:var(--home)"><span class="item-icon" style="color:var(--home)"><svg><use href="#icon-birddog"/></svg></span><span class="item-text">Bird Dog</span><span class="item-meta">2 × 10/side</span></label>
+  </section>
+
+  <footer>Consistency over intensity — check in with yourself weekly, not just the scale.</footer>
+</div>
+
+<script>
+  // ---- Day Tabs ----
+  function initDayTabs(){
+    const pills = document.querySelectorAll('#week-strip .pill');
+    const dayCards = document.querySelectorAll('.day[data-day]');
+
+    function showDay(day){
+      dayCards.forEach(card => {
+        card.classList.toggle('tab-hidden', card.getAttribute('data-day') !== day);
+      });
+      pills.forEach(p => {
+        p.classList.toggle('active', p.getAttribute('data-day') === day);
+      });
+    }
+
+    pills.forEach(p => {
+      p.addEventListener('click', () => showDay(p.getAttribute('data-day')));
+    });
+
+    // default to today's gym day if it's Tue/Wed/Thu, otherwise Tuesday
+    const dowMap = { 2: 'tue', 3: 'wed', 4: 'thu' };
+    const today = new Date().getDay();
+    showDay(dowMap[today] || 'tue');
+  }
+  initDayTabs();
+
+  const days = document.querySelectorAll('[data-day]');
+  days.forEach(dayEl => {
+    const key = dayEl.getAttribute('data-day');
+    const boxes = dayEl.querySelectorAll('input[type="checkbox"]');
+    const progressEl = document.getElementById('progress-' + key);
+    const stripCountEl = document.getElementById('count-' + key);
+
+    function update(){
+      const total = boxes.length;
+      const done = Array.from(boxes).filter(b => b.checked).length;
+      if(progressEl) progressEl.textContent = done + '/' + total + ' done';
+      if(stripCountEl) stripCountEl.textContent = done + '/' + total;
+      boxes.forEach(b => {
+        const item = b.closest('.item');
+        if(item) item.classList.toggle('done', b.checked);
+      });
+    }
+
+    boxes.forEach(b => b.addEventListener('change', update));
+    update();
+  });
+
+  // ---- Calendar Check-In ----
+  const STORAGE_KEY = 'gym-attendance';
+  let attendance = new Set(); // dates as 'YYYY-MM-DD'
+  let viewYear = 2026, viewMonth = 7; // August 2026 (0-indexed)
+
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  function pad(n){ return n < 10 ? '0' + n : '' + n; }
+
+  function dateKey(y, m, d){ return y + '-' + pad(m + 1) + '-' + pad(d); }
+
+  async function loadAttendance(){
+    try{
+      const result = await window.storage.get(STORAGE_KEY, false);
+      if(result && result.value){
+        const arr = JSON.parse(result.value);
+        attendance = new Set(arr);
+      }
+    }catch(e){
+      // no saved data yet, or storage unavailable — start fresh
+      attendance = new Set();
+    }
+    renderCalendar();
+    updateMotivation();
+  }
+
+  async function saveAttendance(){
+    try{
+      await window.storage.set(STORAGE_KEY, JSON.stringify(Array.from(attendance)), false);
+    }catch(e){
+      console.error('Could not save attendance', e);
+    }
+  }
+
+  function dayColorClass(dow){
+    if(dow === 2) return 'tue';
+    if(dow === 3) return 'wed';
+    if(dow === 4) return 'thu';
+    return '';
+  }
+
+  function renderCalendar(){
+    document.getElementById('cal-label').textContent = monthNames[viewMonth] + ' ' + viewYear;
+    const grid = document.getElementById('cal-days');
+    grid.innerHTML = '';
+
+    const firstDow = new Date(viewYear, viewMonth, 1).getDay();
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+    for(let i = 0; i < firstDow; i++){
+      const empty = document.createElement('div');
+      empty.className = 'cal-cell empty';
+      grid.appendChild(empty);
+    }
+
+    let gymDayCount = 0;
+    let loggedCount = 0;
+    const todayStr = fmtDate(new Date());
+
+    for(let d = 1; d <= daysInMonth; d++){
+      const dow = new Date(viewYear, viewMonth, d).getDay();
+      const cell = document.createElement('div');
+      cell.textContent = d;
+
+      const colorClass = dayColorClass(dow);
+      const cellDateStr = dateKey(viewYear, viewMonth, d);
+      const isToday = cellDateStr === todayStr;
+
+      if(colorClass){
+        gymDayCount++;
+        const key = dateKey(viewYear, viewMonth, d);
+        const isDone = attendance.has(key);
+        if(isDone) loggedCount++;
+        cell.className = 'cal-cell gym ' + colorClass + (isDone ? ' done' : '') + (isToday ? ' today' : '');
+        cell.addEventListener('click', () => {
+          if(attendance.has(key)){
+            attendance.delete(key);
+          } else {
+            attendance.add(key);
+          }
+          saveAttendance();
+          renderCalendar();
+          updateMotivation();
+        });
+      } else {
+        cell.className = 'cal-cell rest' + (isToday ? ' today' : '');
+      }
+
+      grid.appendChild(cell);
+    }
+
+    document.getElementById('cal-summary').textContent =
+      loggedCount + ' of ' + gymDayCount + ' sessions logged this month';
+  }
+
+  document.getElementById('cal-prev').addEventListener('click', () => {
+    viewMonth--;
+    if(viewMonth < 0){ viewMonth = 11; viewYear--; }
+    renderCalendar();
+  });
+  document.getElementById('cal-next').addEventListener('click', () => {
+    viewMonth++;
+    if(viewMonth > 11){ viewMonth = 0; viewYear++; }
+    renderCalendar();
+  });
+
+  loadAttendance();
+
+  function getMonday(d){
+    const date = new Date(d);
+    date.setHours(0,0,0,0);
+    const day = date.getDay();
+    const diff = (day === 0 ? -6 : 1) - day;
+    date.setDate(date.getDate() + diff);
+    return date;
+  }
+
+  function fmtDate(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+
+  function weekComplete(monday){
+    const tue = new Date(monday); tue.setDate(monday.getDate() + 1);
+    const wed = new Date(monday); wed.setDate(monday.getDate() + 2);
+    const thu = new Date(monday); thu.setDate(monday.getDate() + 3);
+    return attendance.has(fmtDate(tue)) && attendance.has(fmtDate(wed)) && attendance.has(fmtDate(thu));
+  }
+
+  function computeStreaks(){
+    if(attendance.size === 0) return { current: 0, longest: 0 };
+
+    const dates = Array.from(attendance).sort();
+    const earliestMonday = getMonday(new Date(dates[0]));
+    const today = new Date();
+    const todayMonday = getMonday(today);
+
+    const weeks = [];
+    let cursor = new Date(earliestMonday);
+    while(cursor <= todayMonday){
+      weeks.push(new Date(cursor));
+      cursor.setDate(cursor.getDate() + 7);
+    }
+
+    let longest = 0, run = 0;
+    weeks.forEach(wk => {
+      if(weekComplete(wk)){ run++; longest = Math.max(longest, run); }
+      else { run = 0; }
+    });
+
+    let idx = weeks.length - 1;
+    if(idx >= 0 && !weekComplete(weeks[idx])){ idx--; } // in-progress week doesn't break the streak
+    let current = 0;
+    while(idx >= 0 && weekComplete(weeks[idx])){
+      current++;
+      idx--;
+    }
+
+    return { current, longest };
+  }
+
+  const BADGES = [
+    { id: 'first',   icon: '🥉', label: 'First Step',       sub: '1 session',   type: 'sessions', threshold: 1 },
+    { id: 'ten',     icon: '🥈', label: 'Building Habit',   sub: '10 sessions', type: 'sessions', threshold: 10 },
+    { id: 'month',   icon: '🔥', label: 'One Month Strong', sub: '4-wk streak', type: 'streak',   threshold: 4 },
+    { id: 'twofive', icon: '🥇', label: 'Quarter Century',  sub: '25 sessions', type: 'sessions', threshold: 25 },
+    { id: 'fifty',   icon: '💎', label: 'Half Century',     sub: '50 sessions', type: 'sessions', threshold: 50 },
+  ];
+
+  function renderBadges(totalSessions, longestStreak){
+    const grid = document.getElementById('badge-grid');
+    grid.innerHTML = '';
+    BADGES.forEach(b => {
+      const value = b.type === 'sessions' ? totalSessions : longestStreak;
+      const unlocked = value >= b.threshold;
+      const el = document.createElement('div');
+      el.className = 'badge' + (unlocked ? ' unlocked' : '');
+      el.innerHTML =
+        '<span class="icon">' + b.icon + '</span>' +
+        '<span class="b-label">' + b.label + '</span>' +
+        '<span class="b-sub">' + b.sub + '</span>';
+      grid.appendChild(el);
+    });
+  }
+
+  function updateMotivation(){
+    const { current, longest } = computeStreaks();
+    document.getElementById('streak-current').textContent = current;
+    document.getElementById('streak-longest').textContent = longest;
+    renderBadges(attendance.size, longest);
+  }
+
+  updateMotivation();
+  // (also re-run from loadAttendance once storage resolves)
+
+  // ---- Progress Check-In ----
+  const PROGRESS_KEY = 'progress-log';
+  const GOAL_KG = 55;
+  let progressLog = []; // [{date, weight, note}]
+
+  const dateInput = document.getElementById('p-date');
+  const weightInput = document.getElementById('p-weight');
+  const noteInput = document.getElementById('p-note');
+  const addBtn = document.getElementById('p-add');
+  const listEl = document.getElementById('progress-list');
+  const summaryEl = document.getElementById('progress-summary');
+
+  // default the date field to today
+  (function setDefaultDate(){
+    const now = new Date();
+    dateInput.value = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+  })();
+
+  async function loadProgress(){
+    try{
+      const result = await window.storage.get(PROGRESS_KEY, false);
+      if(result && result.value){
+        progressLog = JSON.parse(result.value);
+      }
+    }catch(e){
+      progressLog = [];
+    }
+    renderProgress();
+  }
+
+  async function saveProgress(){
+    try{
+      await window.storage.set(PROGRESS_KEY, JSON.stringify(progressLog), false);
+    }catch(e){
+      console.error('Could not save progress log', e);
+    }
+  }
+
+  function renderProgress(){
+    const sorted = [...progressLog].sort((a, b) => a.date.localeCompare(b.date));
+
+    if(sorted.length === 0){
+      summaryEl.style.display = 'none';
+      document.getElementById('weight-bar-wrap').style.display = 'none';
+      listEl.innerHTML = '<p class="progress-empty">No entries yet — log your first check-in whenever you\'re ready.</p>';
+      return;
+    }
+
+    const first = sorted[0];
+    const latest = sorted[sorted.length - 1];
+    const sinceChange = (latest.weight - first.weight);
+    const toGo = (latest.weight - GOAL_KG);
+
+    summaryEl.style.display = 'flex';
+    document.getElementById('stat-since').textContent =
+      (sinceChange > 0 ? '+' : '') + sinceChange.toFixed(1) + 'kg';
+    document.getElementById('stat-togo').textContent =
+      (toGo > 0 ? toGo.toFixed(1) : '0.0') + 'kg';
+    document.getElementById('stat-latest').textContent = latest.weight.toFixed(1) + 'kg';
+
+    // weight progress bar: from first logged weight down to the 55kg goal
+    const barWrap = document.getElementById('weight-bar-wrap');
+    const startWeight = first.weight;
+    if(startWeight > GOAL_KG){
+      barWrap.style.display = 'block';
+      let percent = ((startWeight - latest.weight) / (startWeight - GOAL_KG)) * 100;
+      percent = Math.max(0, Math.min(100, percent));
+      document.getElementById('wb-start-label').textContent = 'Start: ' + startWeight.toFixed(1) + 'kg';
+      document.getElementById('weight-bar-fill').style.width = percent + '%';
+      const knob = document.getElementById('weight-bar-knob');
+      knob.style.left = percent + '%';
+      knob.textContent = latest.weight.toFixed(1) + 'kg';
+    } else {
+      barWrap.style.display = 'none';
+    }
+
+    listEl.innerHTML = '';
+    // show most recent first
+    const reversed = [...sorted].reverse();
+    reversed.forEach((entry, idx) => {
+      const originalIdx = sorted.length - 1 - idx;
+      const prev = sorted[originalIdx - 1];
+      const row = document.createElement('div');
+      row.className = 'progress-row';
+
+      let deltaHtml = '<span class="p-delta"></span>';
+      if(prev){
+        const delta = entry.weight - prev.weight;
+        const cls = delta < 0 ? 'down' : (delta > 0 ? 'up' : '');
+        const sign = delta > 0 ? '+' : '';
+        deltaHtml = '<span class="p-delta ' + cls + '">' + sign + delta.toFixed(1) + 'kg</span>';
+      }
+
+      row.innerHTML =
+        '<span class="p-date">' + entry.date + '</span>' +
+        '<span class="p-weight">' + entry.weight.toFixed(1) + 'kg</span>' +
+        deltaHtml +
+        '<span class="p-note">' + (entry.note ? entry.note : '') + '</span>' +
+        '<button class="p-del" title="Remove entry">✕</button>';
+
+      row.querySelector('.p-del').addEventListener('click', () => {
+        progressLog = progressLog.filter(e => e !== entry);
+        saveProgress();
+        renderProgress();
+      });
+
+      listEl.appendChild(row);
+    });
+  }
+
+  addBtn.addEventListener('click', () => {
+    const date = dateInput.value;
+    const weight = parseFloat(weightInput.value);
+    const note = noteInput.value.trim();
+
+    if(!date || isNaN(weight) || weight <= 0){
+      weightInput.style.borderColor = 'var(--thu)';
+      return;
+    }
+    weightInput.style.borderColor = '';
+
+    // replace existing entry for same date if present
+    progressLog = progressLog.filter(e => e.date !== date);
+    progressLog.push({ date, weight, note });
+
+    saveProgress();
+    renderProgress();
+
+    weightInput.value = '';
+    noteInput.value = '';
+  });
+
+  loadProgress();
+</script>
+</body>
+</html>
